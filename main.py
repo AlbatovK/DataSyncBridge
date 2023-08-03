@@ -10,7 +10,7 @@ from util.FileUtils import get_firebase_config, get_s3_config, get_bot_config, c
 def handle_photo(update: Update, context: CallbackContext):
     item = update.message.photo[-1]
     file_name = context.bot.get_file(item.file_id).download()
-    DataBridgeRepository.get_instance().save_file_to_s3(file_name)
+    DataBridgeRepository.get_instance().save_file(file_name, update.message.from_user.id)
     clear_photo(file_name)
 
 
