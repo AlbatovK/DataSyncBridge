@@ -31,6 +31,7 @@ def get_bot_config():
 
 def delete_file(filepath):
     os.remove(filepath)
+    print(f'Removed {filepath}')
 
 
 def get_absolute_cwd():
