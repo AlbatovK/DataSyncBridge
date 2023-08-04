@@ -1,18 +1,48 @@
 import boto3
 import pyrebase.pyrebase
 from telegram import Update
-from telegram.ext import Updater, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, MessageHandler, Filters, CallbackContext, CommandHandler
 
+from data.StorageFileDao import StorageFileDao
 from domain.repository.DataBridgeRepository import DataBridgeRepository
 from util.FileUtils import get_firebase_config, get_s3_config, get_bot_config, clear_photo
 
 
+def start(update: Update, context):
+    user = {
+        'id': update.message.from_user.id,
+        'name': update.message.from_user.username,
+    }
+
+    data = DataBridgeRepository.get_instance().get_user(user)
+
+    if DataBridgeRepository.get_instance().is_user_exists(data):
+        DataBridgeRepository.get_instance().create_new_profile(user)
+        update.message.reply_text('Привет, новый пользователь, введи этот код в приложение на своём компьютере: ' + str(user['id']))
+    else:
+        update.message.reply_text('Вы уже зарегистрированы, код для поключения с компьютера: ' + str(user['id']))
+
 def handle_photo(update: Update, context: CallbackContext):
-    item = update.message.photo[-1]
-    file_name = context.bot.get_file(item.file_id).download()
-    DataBridgeRepository.get_instance().save_file(file_name, update.message.from_user.id)
-    clear_photo(file_name)
-    update.message.reply_text('Картинка сохранена')
+    user = {
+        'id': update.message.from_user.id,
+        'name': update.message.from_user.username,
+    }
+
+    data = DataBridgeRepository.get_instance().get_user(user)
+
+    if DataBridgeRepository.get_instance().is_user_exists(data):
+        update.message.reply_text('Вы не зарегестрированы, напишите /start и отправьте картинку ещё раз')
+    else:
+        item = update.message.photo[-1]
+        file_name = context.bot.get_file(item.file_id).download()
+        DataBridgeRepository.get_instance().save_file(file_name, user)
+        clear_photo(file_name)
+        update.message.reply_text('Картинка сохранена')
+
+        DataBridgeRepository.get_instance().create_new_profile(user, file_name)
+
+        update.message.reply_text('Картинка сохранена')
+
 
 
 def main():
@@ -41,6 +71,7 @@ def main():
 
     dispatcher = updater.dispatcher
     photo_handler = MessageHandler(Filters.photo, handle_photo, run_async=True)
+    dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(photo_handler)
     updater.start_polling()
 
