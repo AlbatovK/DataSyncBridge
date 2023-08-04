@@ -7,11 +7,18 @@ class StorageFileDao:
         self.__db = firebase.database()
 
     def get_user(self, user: dict):
-        data = self.__db.child('users').child(user['id']).get()
-        return data
+        return self.__db.child('users').child(user['id']).get().val()
 
-    def create_new_profile(self, user: dict):
-        self.__db.child('users').child(user['id']).set({'name': user['name']})
+    def save_user(self, user: dict):
+        self.__db.child('users').child(user['id']).set(
+            {
+                'name': user['name']
+            }
+        )
 
-    def add_photo(self, user: dict, file_name: str):
-        self.__db.child('users').child(user['id']).child('photo').push({'img': file_name})
+    def add_photo_to_user(self, user: dict, file_name: str):
+        self.__db.child('users').child(user['id']).child('photo').push(
+            {
+                'img': file_name
+            }
+        )
