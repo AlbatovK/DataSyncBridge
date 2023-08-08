@@ -22,8 +22,9 @@ class DataBridgeRepository:
             cls.__instance = DataBridgeRepository()
         return cls.__instance
 
-    def save_file(self, file_name: str):
+    def save_file(self, file_name: str, user: dict):
         self.__s3_api.s3_upload_file(file_name)
+        self.__dao.add_photo_to_user(user, file_name)
 
     def get_user(self, user: dict):
         return self.__dao.get_user(user)
@@ -33,6 +34,3 @@ class DataBridgeRepository:
 
     def create_new_profile(self, user: dict):
         self.__dao.save_user(user)
-
-    def add_photo(self, user: dict, file_name: str):
-        self.__dao.add_photo_to_user(user, file_name)
