@@ -38,7 +38,7 @@ def handle_photo(update: Update, context: CallbackContext):
 
     item = update.message.photo[-1]
     file_name = context.bot.get_file(item.file_id).download()
-    DataBridgeRepository.get_instance().save_file(file_name)
+    DataBridgeRepository.get_instance().save_file(file_name, user)
     clear_photo(file_name)
     update.message.reply_text('Картинка сохранена')
 
