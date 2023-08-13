@@ -1,3 +1,5 @@
+from typing import Union
+
 from data.remote.firebase.FirebaseStreamService import FirebaseStreamService
 from data.remote.s3.S3Api import S3Api
 from domain.repository.RemoteFileStorageRepository import RemoteFileStorageRepository
@@ -22,3 +24,9 @@ class RemoteFileStorageRepositoryImpl(RemoteFileStorageRepository):
         if cls.__instance is None:
             cls.__instance = RemoteFileStorageRepositoryImpl()
         return cls.__instance
+
+    def stream_storage_events(self, user_id: Union[int, str], events_handler: callable):
+        self.__stream_service.start_streaming(user_id, events_handler)
+
+    def download_file(self, file_name, local_dir: str):
+        self.__s3_api.s3_download_file(file_name, local_dir)

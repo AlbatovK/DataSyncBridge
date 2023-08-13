@@ -60,7 +60,8 @@ class MainAppModule(AbstractModule):
     def provideMainControlViewModel(cls):
         return MainControlViewModel(
             UserRepositoryImpl.get_instance(),
-            ClientLocalRepositoryImpl.get_instance()
+            ClientLocalRepositoryImpl.get_instance(),
+            RemoteFileStorageRepositoryImpl.get_instance()
         )
 
     @classmethod

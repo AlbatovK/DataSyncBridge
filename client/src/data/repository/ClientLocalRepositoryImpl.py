@@ -1,8 +1,9 @@
 from data.local.LocalStorageApi import LocalStorageApi
 from domain.model.User import User
+from domain.repository.ClientLocalRepository import ClientLocalRepository
 
 
-class ClientLocalRepositoryImpl:
+class ClientLocalRepositoryImpl(ClientLocalRepository):
     __storage_api = None
     __instance = None
 
@@ -24,6 +25,12 @@ class ClientLocalRepositoryImpl:
             'user',
             user.to_dto()
         )
+
+    def set_default_downloading_directory(self, path):
+        self.__storage_api.set('download_path', path)
+
+    def get_default_downloading_directory(self):
+        return self.__storage_api.get('download_path')
 
     def get_main_user(self):
         return User.from_dto(

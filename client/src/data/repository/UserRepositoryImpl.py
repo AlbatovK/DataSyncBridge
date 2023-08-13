@@ -19,7 +19,7 @@ class UserRepositoryImpl(UserRepository):
             cls.__instance = UserRepositoryImpl()
         return cls.__instance
 
-    def get_user_by_id(self, user_id: Union[int, str]):
+    def get_user_by_id(self, user_id: Union[int, str]) -> User:
         user = self.__dao.get_user(user_id)
         return User.from_dto(
             user

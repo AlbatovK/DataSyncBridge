@@ -19,7 +19,7 @@ class MainControl(flet.UserControl):
         self.view_model = view_model
 
         self.opacity = 0
-        self.animate_opacity = 700
+        self.animate_opacity = 1000
 
         self.on_navigate_back = on_navigate_back
 
@@ -40,15 +40,17 @@ class MainControl(flet.UserControl):
 
         self.page.banner = flet.Banner(
             bgcolor=flet.colors.AMBER_100,
+            content_padding=16,
             leading=flet.Icon(
                 flet.icons.WARNING_AMBER_ROUNDED,
                 color=flet.colors.AMBER,
                 size=60
             ),
             content=flet.Text(
-                size=14,
+                size=16,
                 color=flet.colors.BLACK,
-                value=f'Are you sure you want to exit your profile?'
+                value='Are you sure you want to exit your user account?\n' +
+                      'It would require you to authenticate again after reboot.'
             ),
             actions=[
                 flet.TextButton(

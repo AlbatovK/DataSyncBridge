@@ -1,5 +1,6 @@
 import asyncio
 import json
+import os
 import pathlib
 
 import flet
@@ -83,8 +84,14 @@ def main(page: flet.Page):
             animate_boot()
         )
 
-    enter_main_screen() if MainAppModule.provideClientLocalRepository().is_user_set() else enter_auth_screen()
+    if MainAppModule.provideClientLocalRepository().is_user_set():
+        enter_main_screen()
+    else:
+        MainAppModule.provideClientLocalRepository().set_default_downloading_directory(
+            os.getcwd()
+        )
+        enter_auth_screen()
 
 
 if __name__ == "__main__":
-    flet.app(target=main, view=AppView.FLET_APP)
+    flet.app(target=main, view=AppView.FLET_APP, name='DataSyncBridge Client App')
