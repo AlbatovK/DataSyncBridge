@@ -1,8 +1,7 @@
 from typing import Union
 
-from domain.model.User import User
 from data.remote.firebase.FirebaseDao import FirebaseDao
-from data.remote.s3.S3Api import S3Api
+from domain.model.User import User
 from domain.repository.UserRepository import UserRepository
 
 

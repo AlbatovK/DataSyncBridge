@@ -2,8 +2,6 @@ from enum import Enum
 
 import requests
 
-from data.repository.ClientLocalRepositoryImpl import ClientLocalRepositoryImpl
-from data.repository.RemoteFileStorageRepositoryImpl import RemoteFileStorageRepositoryImpl
 from domain.repository.ClientLocalRepository import ClientLocalRepository
 from domain.repository.UserRepository import UserRepository
 from presentation.utility.LiveData import LiveData

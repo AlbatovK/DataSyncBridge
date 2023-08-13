@@ -1,6 +1,3 @@
-from data.repository.ClientLocalRepositoryImpl import ClientLocalRepositoryImpl
-from data.repository.RemoteFileStorageRepositoryImpl import RemoteFileStorageRepositoryImpl
-from data.repository.UserRepositoryImpl import UserRepositoryImpl
 from domain.repository.ClientLocalRepository import ClientLocalRepository
 from domain.repository.UserRepository import UserRepository
 
