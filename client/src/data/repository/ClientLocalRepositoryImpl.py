@@ -1,3 +1,6 @@
+from os import listdir
+from os.path import isfile, join
+
 from data.local.LocalStorageApi import LocalStorageApi
 from domain.model.User import User
 from domain.repository.ClientLocalRepository import ClientLocalRepository
@@ -31,6 +34,15 @@ class ClientLocalRepositoryImpl(ClientLocalRepository):
 
     def get_default_downloading_directory(self):
         return self.__storage_api.get('download_path')
+
+    def list_default_downloading_directory(self):
+        return [
+            f for f in listdir(
+                self.get_default_downloading_directory()
+            ) if isfile(
+                join(self.get_default_downloading_directory(), f)
+            )
+        ]
 
     def get_main_user(self):
         return User.from_dto(

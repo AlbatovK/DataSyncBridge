@@ -12,3 +12,11 @@ class RemoteFileStorageRepository:
     @abstractmethod
     def download_file(self, file_name, local_dir):
         pass
+
+    @abstractmethod
+    def list_remote_storage_files(self):
+        pass
+
+    @abstractmethod
+    def close_resources(self):
+        pass

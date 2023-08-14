@@ -1,7 +1,9 @@
 import flet
-from flet_core import FilePicker, FilePickerResultEvent, Page
+from flet_core import FilePickerResultEvent, Page
 
+from domain.model.StorageEvent import StorageEvent
 from presentation.main_screen.MainControlViewModel import MainControlViewModel
+from presentation.utility.Observer import Observer
 
 
 class MainControl(flet.UserControl):
@@ -10,12 +12,11 @@ class MainControl(flet.UserControl):
             self,
             view_model: MainControlViewModel,
             page: Page,
-            file_picker: FilePicker,
             on_navigate_back: callable
     ):
         super().__init__()
         self.page = page
-        self.file_picker = file_picker
+        self.file_picker = flet.FilePicker()
         self.view_model = view_model
 
         self.opacity = 0
@@ -111,21 +112,23 @@ class MainControl(flet.UserControl):
             )
         )
 
+        user_name_txt = flet.Text(
+            max_lines=1,
+            overflow=flet.TextOverflow.ELLIPSIS,
+            size=24,
+            color=flet.colors.BLUE_200,
+            value=self.view_model.get_user().name
+        )
+
         user_info_card = flet.Card(
             width=200,
-            elevation=1.5,
+            elevation=2,
             shadow_color=flet.colors.BLUE_300,
             content=flet.Container(
                 padding=10,
                 content=flet.Column(
                     controls=[
-                        flet.Text(
-                            max_lines=1,
-                            overflow=flet.TextOverflow.ELLIPSIS,
-                            size=24,
-                            color=flet.colors.BLUE_200,
-                            value=self.view_model.get_user().name
-                        ),
+                        user_name_txt,
                         flet.Text(
                             size=12,
                             color=flet.colors.GREY_500,
@@ -143,11 +146,47 @@ class MainControl(flet.UserControl):
             spacing=10,
             run_spacing=10,
             auto_scroll=True,
-            controls=[
-                flet.Icon(
-                    flet.icons.PHOTO
-                ) for _ in range(10)
+        )
+
+        def on_remote_storage_changed(new_files):
+            print(new_files)
+            icon_grid_view.clean()
+            icon_grid_view.controls = [
+                flet.Image(
+                    src=file,
+                    width=200,
+                    height=200,
+                    fit=flet.ImageFit.FILL
+                ) for file in new_files
             ]
+            icon_grid_view.update()
+
+        self.view_model.remote_storage_files_live_data.add_observer(
+            Observer(on_remote_storage_changed)
+        )
+
+        def on_storage_state_changed(event: StorageEvent):
+            if event is StorageEvent.ConnectionLostEvent:
+                user_info_card.shadow_color = flet.colors.RED_400
+                user_name_txt.color = flet.colors.RED_400
+                connection_state_txt.value = 'Connection lost'
+                connection_state_txt.update()
+                user_info_card.update()
+            elif event is StorageEvent.ConnectionStoppedEvent:
+                user_info_card.shadow_color = flet.colors.GREY_200
+                user_name_txt.color = flet.colors.GREY_500
+                connection_state_txt.value = 'Connection stopped'
+                connection_state_txt.update()
+                user_info_card.update()
+            else:
+                user_info_card.shadow_color = flet.colors.BLUE_300
+                user_name_txt.color = flet.colors.BLUE_200
+                connection_state_txt.value = 'Connected'
+                connection_state_txt.update()
+                user_info_card.update()
+
+        self.view_model.storage_event_live_data.add_observer(
+            Observer(on_storage_state_changed)
         )
 
         return flet.Container(
@@ -215,6 +254,7 @@ class MainControl(flet.UserControl):
                                     )
                                 ),
                                 flet.Container(
+                                    padding=20,
                                     width=self.width,
                                     content=icon_grid_view
                                 )

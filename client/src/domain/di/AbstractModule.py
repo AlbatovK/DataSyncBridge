@@ -6,5 +6,5 @@ class AbstractModule:
 
     @classmethod
     @abstractmethod
-    def inject_dependencies(cls, firebase_config, s3_config, local_storage):
+    def inject_dependencies(cls, firebase_config, s3_config, local_storage, on_fall_back):
         pass

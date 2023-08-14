@@ -4,7 +4,7 @@ import os
 import pathlib
 
 import flet
-from flet_core import AppView, FilePicker
+from flet_core import AppView
 
 from domain.di.MainAppModule import MainAppModule
 from presentation.auth_screen.AuthControl import AuthControl
@@ -26,14 +26,12 @@ def get_config(config_file_name: str) -> dict:
 
 
 def main(page: flet.Page):
+    page.title = 'DataSyncBridge Client App'
     page.theme_mode = flet.ThemeMode.SYSTEM
     page.vertical_alignment = flet.MainAxisAlignment.CENTER
     page.window_width = page.window_max_width = 760
     page.window_height = page.window_max_height = 700
     page.window_center()
-
-    file_picker = FilePicker()
-    page.overlay.append(file_picker)
 
     firebase_cnfg = get_config('firebase_config.json')
     s3_cnfg = get_config('s3_config.json')
@@ -41,7 +39,8 @@ def main(page: flet.Page):
     MainAppModule.inject_dependencies(
         firebase_config=firebase_cnfg,
         s3_config=s3_cnfg,
-        local_storage=page.client_storage
+        local_storage=page.client_storage,
+        on_fall_back=lambda _: None
     )
 
     def enter_main_screen():
@@ -50,7 +49,7 @@ def main(page: flet.Page):
             enter_auth_screen()
 
         main_control = MainControl(
-            MainAppModule.provideMainControlViewModel(), page, file_picker, on_navigate
+            MainAppModule.provideMainControlViewModel(), page, on_navigate
         )
 
         page.add(main_control)
@@ -91,6 +90,10 @@ def main(page: flet.Page):
             os.getcwd()
         )
         enter_auth_screen()
+
+
+def cleanup():
+    MainAppModule.provideRemoteFileStorageRepository().close_resources()
 
 
 if __name__ == "__main__":

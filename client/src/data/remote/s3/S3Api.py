@@ -21,4 +21,4 @@ class S3Api:
         self.__s3_client.download_file(self.__main_bucket, file_name, local_dir + '/' + file_name, Config=self.__config)
 
     def s3_list_objects(self) -> dict:
-        return self.__s3_client.list_objects(Bucket=self.__main_bucket)
+        return self.__s3_client.list_objects(Bucket=self.__main_bucket).get('Contents', [])

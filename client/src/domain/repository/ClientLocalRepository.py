@@ -19,6 +19,10 @@ class ClientLocalRepository:
         pass
 
     @abstractmethod
+    def list_default_downloading_directory(self):
+        pass
+
+    @abstractmethod
     def set_main_user(self, user: User):
         pass
 
