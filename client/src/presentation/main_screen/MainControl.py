@@ -18,6 +18,8 @@ class MainControl(flet.UserControl):
         self.page = page
         self.file_picker = flet.FilePicker()
         self.view_model = view_model
+        self.page.overlay.append(self.file_picker)
+        self.page.update()
 
         self.opacity = 0
         self.animate_opacity = 1000
