@@ -12,7 +12,8 @@ class StorageFileDao:
     def save_user(self, user: dict):
         self.__db.child('users').child(user['id']).set(
             {
-                'name': user['name']
+                'name': user['name'],
+                'user_id': user['id']
             }
         )
 
