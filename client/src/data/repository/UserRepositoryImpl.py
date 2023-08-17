@@ -19,6 +19,9 @@ class UserRepositoryImpl(UserRepository):
             cls.__instance = UserRepositoryImpl()
         return cls.__instance
 
+    def delete_user_file_node(self, user_id, node):
+        self.__dao.delete_user_file_node(user_id, node)
+
     def get_user_by_id(self, user_id: Union[int, str]) -> User:
         user = self.__dao.get_user(user_id)
         return User.from_dto(

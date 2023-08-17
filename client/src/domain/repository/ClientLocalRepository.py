@@ -7,7 +7,7 @@ class ClientLocalRepository:
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def is_user_set(self):
+    def is_default_local_user_set(self):
         pass
 
     @abstractmethod
@@ -23,13 +23,13 @@ class ClientLocalRepository:
         pass
 
     @abstractmethod
-    def set_main_user(self, user: User):
+    def set_default_local_user(self, user: User):
         pass
 
     @abstractmethod
-    def get_main_user(self) -> User:
+    def get_default_local_user(self) -> User:
         pass
 
     @abstractmethod
-    def clear_main_user(self):
+    def clear_default_local_user(self):
         pass

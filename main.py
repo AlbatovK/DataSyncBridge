@@ -1,3 +1,5 @@
+import time
+
 import boto3
 import pyrebase.pyrebase
 from telegram import Update
@@ -68,7 +70,7 @@ def main():
     updater = Updater(token)
 
     dispatcher = updater.dispatcher
-    photo_handler = MessageHandler(Filters.photo, handle_photo, run_async=True)
+    photo_handler = MessageHandler(Filters.photo, handle_photo, run_async=False)
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(photo_handler)
     updater.start_polling()

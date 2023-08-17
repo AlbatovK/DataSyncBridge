@@ -18,5 +18,9 @@ class RemoteFileStorageRepository:
         pass
 
     @abstractmethod
+    def stop_streaming(self):
+        pass
+
+    @abstractmethod
     def close_resources(self):
         pass

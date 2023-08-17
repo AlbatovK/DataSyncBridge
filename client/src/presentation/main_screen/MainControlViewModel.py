@@ -1,5 +1,3 @@
-import os
-import time
 from os.path import join
 from threading import Thread
 
@@ -19,16 +17,20 @@ class MainControlViewModel:
         self.__user_repo = user_repo
         self.__local_repo = local_repo
         self.__storage_repo = file_storage_repo
-        self.__user = local_repo.get_main_user()
+
+        self.__user = local_repo.get_default_local_user()
 
         self.storage_event_live_data = LiveData()
-        self.downloads_set = set()
+
+        self.remote_storage_files_live_data = LiveData()
+
+        self.active = True
 
         self.start_stream_process()
 
-        self.remote_storage_files_live_data = LiveData(
-            self.__storage_repo.list_remote_storage_files()
-        )
+    def close(self):
+        self.active = False
+        self.__storage_repo.stop_streaming()
 
     def start_stream_process(self):
         Thread(
@@ -36,45 +38,65 @@ class MainControlViewModel:
         ).start()
 
     def process_event(self, event, data):
-        print(event)
+
+        if not self.active:
+            return
+
         self.storage_event_live_data.data = event
+
+        print(event, data)
+
         if event is StorageEvent.RealtimeDataPutEvent:
-            if data['img'] not in self.downloads_set:
-                self.__storage_repo.download_file(
-                    data['img'], self.__local_repo.get_default_downloading_directory()
-                )
-                self.downloads_set.add(data['img'])
+            if data['data'] is None:
+                return
+            node, f_name = data['path'], data['data']['img']
+
+            self.__storage_repo.download_file(
+                f_name, self.__local_repo.get_default_downloading_directory()
+            )
+
+            self.__user_repo.delete_user_file_node(
+                self.__user.user_id, node,
+            )
+
         elif event is StorageEvent.OverdueDataPutEvent:
-            for _, file_dct in data.items():
-                file = file_dct['img']
-                if (file not in self.__local_repo.list_default_downloading_directory()
-                        and file not in self.downloads_set):
-                    self.downloads_set.add(file)
-                    self.__storage_repo.download_file(
-                        file, self.__local_repo.get_default_downloading_directory()
-                    )
 
-        def async_load():
-            time.sleep(2)
-            self.remote_storage_files_live_data.data = [
-                join(self.__local_repo.get_default_downloading_directory(), x.file_name)
-                for x in self.__storage_repo.list_remote_storage_files()
-            ]
+            if data is None:
+                return
 
-        Thread(target=async_load).start()
+            for key, f_name in data.items():
+                self.__storage_repo.download_file(
+                    f_name['img'], self.__local_repo.get_default_downloading_directory()
+                )
+
+                self.__user_repo.delete_user_file_node(
+                    self.__user.user_id, key
+                )
+
+        Thread(target=self.sync_downloaded_files).start()
 
     def get_user(self):
         return self.__user
 
     def on_user_exit(self):
-        self.__local_repo.clear_main_user()
+        self.__local_repo.clear_default_local_user()
 
     def on_download_directory_chosen(self, path):
-        if path is not None:
+        if path is not None and path != self.__local_repo.get_default_downloading_directory():
             self.__local_repo.set_default_downloading_directory(path)
+            self.sync_downloaded_files()
 
     def on_connection_retry_clicked(self):
         self.start_stream_process()
 
     def on_connection_stop_clicked(self):
-        self.__storage_repo.close_resources()
+        self.__storage_repo.stop_streaming()
+
+    def sync_downloaded_files(self):
+        self.remote_storage_files_live_data.data = [
+            join(self.__local_repo.get_default_downloading_directory(), x) for x in
+            self.__local_repo.list_default_downloading_directory()
+        ]
+
+    def on_mount(self):
+        self.sync_downloaded_files()

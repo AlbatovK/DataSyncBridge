@@ -13,3 +13,6 @@ class User:
 
     def to_dto(self):
         return self.__dict__
+
+    def __repr__(self):
+        return f'{self.user_id} {self.name}'

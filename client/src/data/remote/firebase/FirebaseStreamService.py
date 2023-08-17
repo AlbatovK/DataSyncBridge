@@ -1,4 +1,3 @@
-from threading import Thread
 from typing import Union
 
 import requests
@@ -11,18 +10,28 @@ from domain.model.StorageEvent import StorageEvent
 class FirebaseStreamService:
     __stream = None
     __stream_event_handler = None
+    __last_event = None
 
     def __init__(self, firebase: Firebase):
         self.__db = firebase.database()
 
-    def stop_streaming(self):
-        def close_connection():
+    def strictly_close_stream(self):
+        while True:
             try:
                 self.__stream.close()
-            except AttributeError as e:
-                print(e)
+            except AttributeError:
+                break
 
-        Thread(target=close_connection).start()
+    def close_stream(self):
+        self.__stream.stream_handler = lambda _: None
+        self.strictly_close_stream()
+        self.__stream = None
+
+    def stop_streaming(self):
+        self.__stream.stream_handler = lambda _: None
+
+        self.strictly_close_stream()
+
         self.__stream_event_handler(
             StorageEvent.ConnectionStoppedEvent, None
         )
@@ -30,15 +39,25 @@ class FirebaseStreamService:
     def start_streaming(self, stream_user_id: Union[str, int], stream_event_handler: callable):
 
         self.__stream_event_handler = stream_event_handler
+        self.__stream_event_handler(
+            StorageEvent.ConnectionSettledEvent, None
+        )
 
         def stream_handler(e):
+
+            if e['event'] != 'put':
+                return
+
             if e['path'] == "/":
                 event = StorageEvent.OverdueDataPutEvent
                 data = e['data']
             else:
                 event = StorageEvent.RealtimeDataPutEvent
-                data = e['data']
-            self.__stream_event_handler(event, data)
+                data = e
+
+            if self.__stream is not None and self.__last_event != e:
+                self.__last_event = e
+                self.__stream_event_handler(event, data)
 
         try:
             stream_path = self.__db.child('users').child(stream_user_id).child('photo')

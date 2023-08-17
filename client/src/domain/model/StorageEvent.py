@@ -2,8 +2,8 @@ from enum import Enum
 
 
 class StorageEvent(Enum):
-    ConnectionSettledEvent = -1
-    OverdueDataPutEvent = 0
-    RealtimeDataPutEvent = 1
-    ConnectionLostEvent = 2
-    ConnectionStoppedEvent = 3
+    ConnectionSettledEvent = 0
+    OverdueDataPutEvent = 1
+    RealtimeDataPutEvent = 2
+    ConnectionLostEvent = 3
+    ConnectionStoppedEvent = 4

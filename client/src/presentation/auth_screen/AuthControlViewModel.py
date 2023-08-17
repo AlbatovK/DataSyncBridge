@@ -38,5 +38,5 @@ class AuthControlViewModel:
             self.auth_state.data = AuthControlViewModel.AuthState.AuthUserNotFoundError
             return
 
-        self.__local_repo.set_main_user(user)
+        self.__local_repo.set_default_local_user(user)
         self.auth_state.data = AuthControlViewModel.AuthState.AuthSuccess
