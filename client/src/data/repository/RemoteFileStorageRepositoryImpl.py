@@ -27,13 +27,22 @@ class RemoteFileStorageRepositoryImpl(RemoteFileStorageRepository):
         return cls.__instance
 
     def list_remote_storage_files(self):
-        return [RemoteStorageFile.from_dto(item) for item in self.__s3_api.s3_list_objects()]
+        return [
+            RemoteStorageFile.from_dto(item) for item in self.__s3_api.s3_list_objects()
+        ]
 
     def stream_storage_events(self, user_id: Union[int, str], events_handler: callable):
         self.__stream_service.start_streaming(user_id, events_handler)
 
     def download_file(self, file_name, local_dir: str):
-        self.__s3_api.s3_download_file(file_name, local_dir)
+
+        try:
+            self.__s3_api.s3_download_file(file_name, local_dir)
+        except Exception as e:
+            print(e, file_name, local_dir)
+
+    def stop_streaming(self):
+        self.__stream_service.stop_streaming()
 
     def close_resources(self):
-        self.__stream_service.stop_streaming()
+        self.__stream_service.close_stream()

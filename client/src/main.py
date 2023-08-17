@@ -40,7 +40,7 @@ def main(page: flet.Page):
         firebase_config=firebase_cnfg,
         s3_config=s3_cnfg,
         local_storage=page.client_storage,
-        on_fall_back=lambda _: None
+        on_fall_back=lambda _: print('Хуйня произошла')
     )
 
     def enter_main_screen():
@@ -90,10 +90,6 @@ def main(page: flet.Page):
             os.getcwd()
         )
         enter_auth_screen()
-
-
-def cleanup():
-    MainAppModule.provideRemoteFileStorageRepository().close_resources()
 
 
 if __name__ == "__main__":

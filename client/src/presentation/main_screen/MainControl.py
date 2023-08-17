@@ -67,6 +67,9 @@ class MainControl(flet.UserControl):
             ]
         )
 
+    def will_unmount(self):
+        self.view_model.close()
+
     def build(self):
         self.setup_banner()
 
@@ -158,10 +161,13 @@ class MainControl(flet.UserControl):
                     src=file,
                     width=200,
                     height=200,
-                    fit=flet.ImageFit.FILL
+                    fit=flet.ImageFit.FILL,
+                    error_content=flet.Text(value=file),
                 ) for file in new_files
             ]
+
             icon_grid_view.update()
+            self.page.update()
 
         self.view_model.remote_storage_files_live_data.add_observer(
             Observer(on_remote_storage_changed)

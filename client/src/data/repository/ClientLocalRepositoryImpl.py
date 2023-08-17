@@ -1,5 +1,6 @@
 from os import listdir
 from os.path import isfile, join
+from pathlib import Path
 
 from data.local.LocalStorageApi import LocalStorageApi
 from domain.model.User import User
@@ -41,7 +42,7 @@ class ClientLocalRepositoryImpl(ClientLocalRepository):
                 self.get_default_downloading_directory()
             ) if isfile(
                 join(self.get_default_downloading_directory(), f)
-            )
+            ) and Path(f).suffix in ['.jpg', '.png']
         ]
 
     def get_main_user(self):

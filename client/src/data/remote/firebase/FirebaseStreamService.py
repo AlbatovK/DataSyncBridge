@@ -1,4 +1,3 @@
-from threading import Thread
 from typing import Union
 
 import requests
@@ -11,18 +10,25 @@ from domain.model.StorageEvent import StorageEvent
 class FirebaseStreamService:
     __stream = None
     __stream_event_handler = None
+    __last_event = None
 
     def __init__(self, firebase: Firebase):
         self.__db = firebase.database()
 
-    def stop_streaming(self):
-        def close_connection():
-            try:
-                self.__stream.close()
-            except AttributeError as e:
-                print(e)
+    def close_stream(self):
+        self.close_connection()
+        self.__stream = None
 
-        Thread(target=close_connection).start()
+    def close_connection(self):
+        try:
+            self.__stream.close()
+        except AttributeError as e:
+            print(e)
+
+    def stop_streaming(self):
+        self.__stream.stream_handler = lambda _: None
+
+        self.__stream.close()
         self.__stream_event_handler(
             StorageEvent.ConnectionStoppedEvent, None
         )
@@ -32,13 +38,17 @@ class FirebaseStreamService:
         self.__stream_event_handler = stream_event_handler
 
         def stream_handler(e):
+            print(e)
             if e['path'] == "/":
                 event = StorageEvent.OverdueDataPutEvent
                 data = e['data']
             else:
                 event = StorageEvent.RealtimeDataPutEvent
                 data = e['data']
-            self.__stream_event_handler(event, data)
+            if self.__stream is not None:
+                self.__last_event = e
+                self.__stream_event_handler(event, data)
+                self.__retried = False
 
         try:
             stream_path = self.__db.child('users').child(stream_user_id).child('photo')
