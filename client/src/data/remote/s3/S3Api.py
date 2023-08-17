@@ -1,7 +1,6 @@
 from os.path import join
 from typing import List
 
-import botocore
 from boto3.s3.transfer import TransferConfig
 from botocore.client import BaseClient
 
@@ -25,7 +24,7 @@ class S3Api:
         self.__s3_client.download_file(self.__main_bucket, file_name, join(local_dir, file_name), Config=self.__config)
 
     def s3_list_objects(self) -> List:
-        try:
-            return self.__s3_client.list_objects(Bucket=self.__main_bucket).get('Contents', [])
-        except botocore.exceptions.EndpointConnectionError:
-            return []
+        return self.__s3_client.list_objects(Bucket=self.__main_bucket).get('Contents', [])
+
+    def s3_delete_file(self, file_name: str):
+        self.__s3_client.delete_object(Bucket=self.__main_bucket, Key=file_name)

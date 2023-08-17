@@ -1,3 +1,4 @@
+import os.path
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path
@@ -21,16 +22,18 @@ class ClientLocalRepositoryImpl(ClientLocalRepository):
             cls.__instance = ClientLocalRepositoryImpl()
         return cls.__instance
 
-    def is_user_set(self):
+    def is_default_local_user_set(self):
         return self.__storage_api.contains_key('user')
 
-    def set_main_user(self, user: User):
+    def set_default_local_user(self, user: User):
         return self.__storage_api.set(
             'user',
             user.to_dto()
         )
 
     def set_default_downloading_directory(self, path):
+        if not os.path.isdir(path):
+            os.makedirs(path, exist_ok=True)
         self.__storage_api.set('download_path', path)
 
     def get_default_downloading_directory(self):
@@ -45,10 +48,10 @@ class ClientLocalRepositoryImpl(ClientLocalRepository):
             ) and Path(f).suffix in ['.jpg', '.png']
         ]
 
-    def get_main_user(self):
+    def get_default_local_user(self):
         return User.from_dto(
             self.__storage_api.get('user')
-        ) if self.is_user_set() else None
+        ) if self.is_default_local_user_set() else None
 
-    def clear_main_user(self):
+    def clear_default_local_user(self):
         self.__storage_api.remove('user')

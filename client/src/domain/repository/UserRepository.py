@@ -9,4 +9,8 @@ class UserRepository:
 
     @abstractmethod
     def get_user_by_id(self, user_id: Union[int, str]) -> User:
-        raise NotImplementedError
+        pass
+
+    @abstractmethod
+    def delete_user_file_node(self, user_id, node):
+        pass

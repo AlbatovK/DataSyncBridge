@@ -35,11 +35,7 @@ class RemoteFileStorageRepositoryImpl(RemoteFileStorageRepository):
         self.__stream_service.start_streaming(user_id, events_handler)
 
     def download_file(self, file_name, local_dir: str):
-
-        try:
-            self.__s3_api.s3_download_file(file_name, local_dir)
-        except Exception as e:
-            print(e, file_name, local_dir)
+        self.__s3_api.s3_download_file(file_name, local_dir)
 
     def stop_streaming(self):
         self.__stream_service.stop_streaming()

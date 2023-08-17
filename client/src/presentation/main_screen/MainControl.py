@@ -16,15 +16,18 @@ class MainControl(flet.UserControl):
     ):
         super().__init__()
         self.page = page
-        self.file_picker = flet.FilePicker()
         self.view_model = view_model
-        self.page.overlay.append(self.file_picker)
-        self.page.update()
 
         self.opacity = 0
         self.animate_opacity = 1000
 
+        self.file_picker = flet.FilePicker()
+        self.page.overlay.append(self.file_picker)
+        self.page.update()
+
         self.on_navigate_back = on_navigate_back
+
+        self.icon_grid_view = None
 
     def setup_banner(self):
         def close_banner():
@@ -66,6 +69,29 @@ class MainControl(flet.UserControl):
                 )
             ]
         )
+
+    def did_mount(self):
+        def on_remote_storage_changed(new_files):
+            print(new_files)
+            self.icon_grid_view.clean()
+            self.icon_grid_view.controls = [
+                flet.Image(
+                    src=file,
+                    width=200,
+                    height=200,
+                    fit=flet.ImageFit.FILL,
+                    error_content=flet.Text(value=file),
+                ) for file in new_files
+            ]
+
+            self.icon_grid_view.update()
+            self.page.update()
+
+        self.view_model.remote_storage_files_live_data.add_observer(
+            Observer(on_remote_storage_changed)
+        )
+
+        self.view_model.on_mount()
 
     def will_unmount(self):
         self.view_model.close()
@@ -128,7 +154,7 @@ class MainControl(flet.UserControl):
         user_info_card = flet.Card(
             width=200,
             elevation=2,
-            shadow_color=flet.colors.BLUE_300,
+            shadow_color=flet.colors.GREY_200,
             content=flet.Container(
                 padding=10,
                 content=flet.Column(
@@ -144,33 +170,13 @@ class MainControl(flet.UserControl):
             )
         )
 
-        icon_grid_view = flet.GridView(
+        self.icon_grid_view = flet.GridView(
             expand=1,
             runs_count=5,
             max_extent=150,
             spacing=10,
             run_spacing=10,
             auto_scroll=True,
-        )
-
-        def on_remote_storage_changed(new_files):
-            print(new_files)
-            icon_grid_view.clean()
-            icon_grid_view.controls = [
-                flet.Image(
-                    src=file,
-                    width=200,
-                    height=200,
-                    fit=flet.ImageFit.FILL,
-                    error_content=flet.Text(value=file),
-                ) for file in new_files
-            ]
-
-            icon_grid_view.update()
-            self.page.update()
-
-        self.view_model.remote_storage_files_live_data.add_observer(
-            Observer(on_remote_storage_changed)
         )
 
         def on_storage_state_changed(event: StorageEvent):
@@ -264,7 +270,7 @@ class MainControl(flet.UserControl):
                                 flet.Container(
                                     padding=20,
                                     width=self.width,
-                                    content=icon_grid_view
+                                    content=self.icon_grid_view
                                 )
                             ],
                         )
