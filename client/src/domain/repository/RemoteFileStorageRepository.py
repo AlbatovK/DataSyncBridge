@@ -14,6 +14,10 @@ class RemoteFileStorageRepository:
         pass
 
     @abstractmethod
+    def delete_file(self, file_name):
+        pass
+
+    @abstractmethod
     def list_remote_storage_files(self):
         pass
 

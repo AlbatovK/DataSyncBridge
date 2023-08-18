@@ -72,15 +72,25 @@ class MainControl(flet.UserControl):
 
     def did_mount(self):
         def on_remote_storage_changed(new_files):
-            print(new_files)
-            self.icon_grid_view.clean()
+            if new_files:
+                self.icon_grid_view.clean()
+
             self.icon_grid_view.controls = [
-                flet.Image(
-                    src=file,
-                    width=200,
-                    height=200,
-                    fit=flet.ImageFit.FILL,
-                    error_content=flet.Text(value=file),
+                flet.Column(
+                    alignment=flet.MainAxisAlignment.CENTER,
+                    horizontal_alignment=flet.CrossAxisAlignment.CENTER,
+                    controls=[
+                        flet.Image(
+                            src=file,
+                            width=200,
+                            border_radius=12,
+                            height=200,
+                            fit=flet.ImageFit.FILL,
+                            error_content=flet.Text(value=file),
+                        ),
+                        flet.ElevatedButton('Show in Explorer'),
+                        flet.ElevatedButton('Delete', color=flet.colors.RED_200)
+                    ]
                 ) for file in new_files
             ]
 
@@ -171,12 +181,10 @@ class MainControl(flet.UserControl):
         )
 
         self.icon_grid_view = flet.GridView(
-            expand=1,
-            runs_count=5,
-            max_extent=150,
-            spacing=10,
-            run_spacing=10,
-            auto_scroll=True,
+            max_extent=300,
+            padding=20,
+            runs_count=9,
+            spacing=40,
         )
 
         def on_storage_state_changed(event: StorageEvent):

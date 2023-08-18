@@ -57,6 +57,7 @@ def main(page: flet.Page):
     page.vertical_alignment = flet.MainAxisAlignment.CENTER
     page.window_width = page.window_max_width = 760
     page.window_height = page.window_max_height = 700
+    page.auto_scroll = True
     page.window_center()
 
     MainAppModule.inject_dependencies(

@@ -59,6 +59,10 @@ class MainControlViewModel:
                 self.__user.user_id, node,
             )
 
+            self.__storage_repo.delete_file(
+                f_name
+            )
+
         elif event is StorageEvent.OverdueDataPutEvent:
 
             if data is None:
@@ -71,6 +75,10 @@ class MainControlViewModel:
 
                 self.__user_repo.delete_user_file_node(
                     self.__user.user_id, key
+                )
+
+                self.__storage_repo.delete_file(
+                    f_name['img']
                 )
 
         Thread(target=self.sync_downloaded_files).start()
