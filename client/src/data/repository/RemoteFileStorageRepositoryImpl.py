@@ -37,6 +37,9 @@ class RemoteFileStorageRepositoryImpl(RemoteFileStorageRepository):
     def download_file(self, file_name, local_dir: str):
         self.__s3_api.s3_download_file(file_name, local_dir)
 
+    def delete_file(self, file_name):
+        self.__s3_api.s3_delete_file(file_name)
+
     def stop_streaming(self):
         self.__stream_service.stop_streaming()
 
