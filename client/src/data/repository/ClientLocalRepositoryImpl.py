@@ -31,6 +31,9 @@ class ClientLocalRepositoryImpl(ClientLocalRepository):
             user.to_dto()
         )
 
+    def delete_internal_file(self, path):
+        os.remove(path)
+
     def set_default_downloading_directory(self, path):
         if not os.path.isdir(path):
             os.makedirs(path, exist_ok=True)

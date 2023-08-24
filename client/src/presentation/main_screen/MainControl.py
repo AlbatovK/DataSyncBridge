@@ -1,3 +1,5 @@
+import subprocess
+
 import flet
 from flet_core import FilePickerResultEvent, Page
 
@@ -88,8 +90,15 @@ class MainControl(flet.UserControl):
                             fit=flet.ImageFit.FILL,
                             error_content=flet.Text(value=file),
                         ),
-                        flet.ElevatedButton('Show in Explorer'),
-                        flet.ElevatedButton('Delete', color=flet.colors.RED_200)
+                        flet.ElevatedButton(
+                            'Show in Explorer',
+                            on_click=lambda _: subprocess.Popen(fr'explorer /select,"{file}"')
+                        ),
+                        flet.ElevatedButton(
+                            'Delete',
+                            color=flet.colors.RED_200,
+                            on_click=lambda _: self.view_model.delete_internal_file(file)
+                        )
                     ]
                 ) for file in new_files
             ]

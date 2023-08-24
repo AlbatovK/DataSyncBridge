@@ -15,6 +15,10 @@ class ClientLocalRepository:
         pass
 
     @abstractmethod
+    def delete_internal_file(self, path):
+        pass
+
+    @abstractmethod
     def get_default_downloading_directory(self):
         pass
 

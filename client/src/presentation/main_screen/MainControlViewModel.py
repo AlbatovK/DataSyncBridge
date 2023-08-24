@@ -101,10 +101,17 @@ class MainControlViewModel:
         self.__storage_repo.stop_streaming()
 
     def sync_downloaded_files(self):
-        self.remote_storage_files_live_data.data = [
-            join(self.__local_repo.get_default_downloading_directory(), x) for x in
-            self.__local_repo.list_default_downloading_directory()
-        ]
+        self.remote_storage_files_live_data.data = sorted(
+            [
+                join(self.__local_repo.get_default_downloading_directory(), x) for x in
+                self.__local_repo.list_default_downloading_directory()
+            ]
+        )
 
     def on_mount(self):
+        self.sync_downloaded_files()
+
+    def delete_internal_file(self, path):
+        print(path)
+        self.__local_repo.delete_internal_file(path)
         self.sync_downloaded_files()
